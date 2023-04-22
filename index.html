@@ -5229,6 +5229,156 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$Main$changeChannelLength = F2(
+	function (length, channel) {
+		var currentLength = $elm$core$List$length(channel.steps);
+		return (_Utils_cmp(length, currentLength) < 1) ? _Utils_update(
+			channel,
+			{
+				steps: A2($elm$core$List$take, length, channel.steps)
+			}) : _Utils_update(
+			channel,
+			{
+				steps: A2(
+					$elm$core$List$append,
+					channel.steps,
+					A2($elm$core$List$repeat, length - currentLength, $author$project$Main$emptyNode))
+			});
+	});
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
@@ -5260,19 +5410,79 @@ var $author$project$Main$replaceChannel = F3(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		var label = msg.a;
-		var index = msg.b;
-		var newChannels = A2(
-			$elm$core$List$map,
-			function (channel) {
-				return A3($author$project$Main$replaceChannel, channel, label, index);
-			},
-			model.channels);
-		return _Utils_update(
-			model,
-			{channels: newChannels});
+		if (msg.$ === 'ToggleStep') {
+			var label = msg.a;
+			var index = msg.b;
+			var newChannels = A2(
+				$elm$core$List$map,
+				function (channel) {
+					return A3($author$project$Main$replaceChannel, channel, label, index);
+				},
+				model.channels);
+			return _Utils_update(
+				model,
+				{channels: newChannels});
+		} else {
+			var lengthStr = msg.a;
+			var length = function () {
+				var _v1 = $elm$core$String$toInt(lengthStr);
+				if (_v1.$ === 'Just') {
+					var intLength = _v1.a;
+					return intLength;
+				} else {
+					return 16;
+				}
+			}();
+			var newChannels = A2(
+				$elm$core$List$map,
+				function (channel) {
+					return A2($author$project$Main$changeChannelLength, length, channel);
+				},
+				model.channels);
+			return _Utils_update(
+				model,
+				{channels: newChannels, steps: length});
+		}
 	});
+var $author$project$Main$SetSequenceLength = function (a) {
+	return {$: 'SetSequenceLength', a: a};
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$option = _VirtualDom_node('option');
 var $author$project$Main$ToggleStep = F2(
 	function (a, b) {
 		return {$: 'ToggleStep', a: a, b: b};
@@ -5290,7 +5500,6 @@ var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$on = F2(
 	function (event, decoder) {
 		return A2(
@@ -5358,12 +5567,183 @@ var $author$project$Main$renderChannel = function (channel) {
 				A2($author$project$Main$renderSteps, channel.label, channel.steps))
 			]));
 };
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
+				A2(
+				$elm$html$Html$select,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onInput($author$project$Main$SetSequenceLength)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('1')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('1')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('2')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('3')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('3')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('4')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('4')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('5')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('5')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('6')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('6')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('7')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('7')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('8')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('8')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('9')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('9')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('10')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('10')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('11')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('11')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('12')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('12')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('13')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('13')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('14')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('14')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('15')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('15')
+							])),
+						A2(
+						$elm$html$Html$option,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value('16')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('16')
+							]))
+					])),
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,

@@ -7,9 +7,9 @@ module Main exposing (..)
 --
 
 import Browser
-import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (checked, type_)
-import Html.Events exposing (onClick)
+import Html exposing (Html, button, div, input, option, select, text)
+import Html.Attributes exposing (checked, type_, value)
+import Html.Events exposing (onClick, onInput)
 
 
 
@@ -81,6 +81,7 @@ init =
 
 type Msg
     = ToggleStep String Int
+    | SetSequenceLength String
 
 
 update : Msg -> Model -> Model
@@ -92,6 +93,33 @@ update msg model =
                     List.map (\channel -> replaceChannel channel label index) model.channels
             in
             { model | channels = newChannels }
+
+        SetSequenceLength lengthStr ->
+            let
+                length =
+                    case String.toInt lengthStr of
+                        Just intLength ->
+                            intLength
+
+                        Nothing ->
+                            16
+
+                newChannels =
+                    List.map (\channel -> changeChannelLength length channel) model.channels
+            in
+            { model | steps = length, channels = newChannels }
+
+
+changeChannelLength length channel =
+    let
+        currentLength =
+            List.length channel.steps
+    in
+    if length <= currentLength then
+        { channel | steps = List.take length channel.steps }
+
+    else
+        { channel | steps = List.append channel.steps (List.repeat (length - currentLength) emptyNode) }
 
 
 replaceChannel channel label index =
@@ -127,7 +155,25 @@ toggleTheStep ( index, step ) targetIndex =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] (List.map renderChannel model.channels)
+        [ select [ onInput SetSequenceLength ]
+            [ option [ value "1" ] [ text "1" ]
+            , option [ value "2" ] [ text "2" ]
+            , option [ value "3" ] [ text "3" ]
+            , option [ value "4" ] [ text "4" ]
+            , option [ value "5" ] [ text "5" ]
+            , option [ value "6" ] [ text "6" ]
+            , option [ value "7" ] [ text "7" ]
+            , option [ value "8" ] [ text "8" ]
+            , option [ value "9" ] [ text "9" ]
+            , option [ value "10" ] [ text "10" ]
+            , option [ value "11" ] [ text "11" ]
+            , option [ value "12" ] [ text "12" ]
+            , option [ value "13" ] [ text "13" ]
+            , option [ value "14" ] [ text "14" ]
+            , option [ value "15" ] [ text "15" ]
+            , option [ value "16" ] [ text "16" ]
+            ]
+        , div [] (List.map renderChannel model.channels)
         ]
 
 
