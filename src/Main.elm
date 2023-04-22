@@ -1,11 +1,5 @@
 module Main exposing (..)
 
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
-
 import Browser
 import Html exposing (Html, button, div, input, option, select, text)
 import Html.Attributes exposing (checked, type_, value)
@@ -38,12 +32,6 @@ type alias Node =
 type alias Channel =
     { label : String
     , steps : List Node
-    }
-
-
-type alias User =
-    { name : String
-    , age : Int
     }
 
 
