@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (Html, button, div, input, option, select, text)
-import Html.Attributes exposing (checked, type_, value)
+import Html.Attributes exposing (checked, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 
 
@@ -142,28 +142,24 @@ toggleTheStep ( index, step ) targetIndex =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ select [ onInput SetSequenceLength ]
-            [ option [ value "1" ] [ text "1" ]
-            , option [ value "2" ] [ text "2" ]
-            , option [ value "3" ] [ text "3" ]
-            , option [ value "4" ] [ text "4" ]
-            , option [ value "5" ] [ text "5" ]
-            , option [ value "6" ] [ text "6" ]
-            , option [ value "7" ] [ text "7" ]
-            , option [ value "8" ] [ text "8" ]
-            , option [ value "9" ] [ text "9" ]
-            , option [ value "10" ] [ text "10" ]
-            , option [ value "11" ] [ text "11" ]
-            , option [ value "12" ] [ text "12" ]
-            , option [ value "13" ] [ text "13" ]
-            , option [ value "14" ] [ text "14" ]
-            , option [ value "15" ] [ text "15" ]
-            , option [ value "16" ] [ text "16" ]
-            ]
-        , div [] (List.map renderChannel model.channels)
+    div [
+       style "padding-left" "100px",
+       style "padding-top" "100px" ]
+
+        [ renderStepCountSelect
+        , renderChannels model.channels
         ]
 
+
+renderStepCountSelect =
+  select [ onInput SetSequenceLength ] rangeList
+
+rangeList =
+  List.range 1 16
+  |> List.map (\num -> option [ value (String.fromInt num)] [ text (String.fromInt num)])
+
+renderChannels channels =
+         div [] (List.map renderChannel channels)
 
 renderChannel channel =
     div []
